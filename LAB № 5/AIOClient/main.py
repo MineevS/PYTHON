@@ -13,21 +13,6 @@ import datetime
 import csv
 import re
 
-
-def init_argpase() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="client rarser")
-    parser.add_argument('-c', '--create', dest='create', action='store_true')
-    parser.add_argument('-a', '--add', dest='add', type=str)
-    parser.add_argument('-o', '--overwrite', dest='overwrite', type=str)
-    parser.add_argument('-d', '--delete', dest='delete', type=str)
-    parser.add_argument('-e', '--export', dest='export', type=str)
-    parser.add_argument('-p', '--print', dest='print', type=str)
-    return parser
-
-    # parser = init_argpase()
-    # args = parser.parse_args()
-
-
 '''
 session.get('http://localhost:8080/labs/')
 session.get('http://localhost:8080/labs/{name_lab}')
@@ -36,12 +21,6 @@ session.put('http://localhost:8080/labs/{name_lab}')
 session.put('http://localhost:8080/labs/{name_lab}/')
 session.delete('http://localhost:8080/labs/{name_lab}')
 '''
-
-
-class str2(str):
-    def __repr__(self):
-        return ''.join(('"', super().__repr__()[1:-1], '"'))
-
 
 class Data:
     code_operation = 0
@@ -58,15 +37,16 @@ async def Handler(data: Data):
                 Программа-клиент для работы с лабораторными работами на сервере.
                 version: 1.0
                 Описание кодов операций:
-                0 - Справка
-                1 - Получение всей информации с сервера по всем лабараторным работам
-                2 - Получение информации по конкретной лабораторной работе
-                3 - Создание лабораторной работы
-                4 - Изменение лабораторной работы (Добавление данных) 
-                5 - Изменение лабораторной работы (Перезапись данных)
-                6 - Удаление данных лабораторной работы
+                0 - Справка.
+                1 - Получение всей информации с сервера по всем лабараторным работам.
+                2 - Получение информации по конкретной лабораторной работе.
+                3 - Создание лабораторной работы.
+                4 - Изменение лабораторной работы (Добавление данных) .
+                5 - Изменение лабораторной работы (Перезапись данных).
+                6 - Удаление данных лабораторной работы.
                 7 - Экспорт всех лабораторных работ в csv-файл.
                 8 - Экспорт конкретной лабораторной работы в csv-файл.
+                exit/quit - выход из программы.
                 ''')
             case 1:  # get-all
                 print("Description:", "get all data all lab")
@@ -286,7 +266,7 @@ def del_dict() -> dict:
         FLAG2 = False
     FLAG3 = input("Требуется ли для данной лабораторной работы удалять"
                   " список студентов полностью? (Y[Yes, Да], N[No, Нет]): ")
-    FLAG4 = False
+    #FLAG4 = False
     if FLAG3 in ['Y', 'Yes', 'Да']:
         FLAG3 = True
     else:
@@ -320,7 +300,11 @@ if __name__ == "__main__":
         print('Введите код операции(Справка - код[0])')
         input_data = input("Client >> ")
 
-        data.code_operation = int(input_data.split(' ')[0])
+        if input_data in ['exit', 'quit']:
+            break
+
+        if input_data.split(' ')[0].isdigit():
+            data.code_operation = int(input_data.split(' ')[0])
 
         if len(input_data.split(' ')) > 1:
             data.name_lab = input_data.split(' ')[1]
@@ -328,7 +312,6 @@ if __name__ == "__main__":
         loop = asyncio.get_event_loop()
         loop.run_until_complete(Handler(data))
 
-        if data.code_operation in ['exit', 'quit']:
-            break
+
 
     print("Close client!")
