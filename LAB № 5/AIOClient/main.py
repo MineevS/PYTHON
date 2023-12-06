@@ -53,6 +53,21 @@ class Data:
 async def Handler(data: Data):
     async with aiohttp.ClientSession() as session:
         match data.code_operation:
+            case 0:
+                print(''' 
+                Программа-клиент для работы с лабораторными работами на сервере.
+                version: 1.0
+                Описание кодов операций:
+                0 - Справка
+                1 - Получение всей информации с сервера по всем лабараторным работам
+                2 - Получение информации по конкретной лабораторной работе
+                3 - Создание лабораторной работы
+                4 - Изменение лабораторной работы (Добавление данных) 
+                5 - Изменение лабораторной работы (Перезапись данных)
+                6 - Удаление данных лабораторной работы
+                7 - Экспорт всех лабораторных работ в csv-файл.
+                8 - Экспорт конкретной лабораторной работы в csv-файл.
+                ''')
             case 1:  # get-all
                 print("Description:", "get all data all lab")
                 async with session.get('http://localhost:8080/labs/') as response:
@@ -211,7 +226,7 @@ async def Handler(data: Data):
                                 for student in jsonDate["Students"]:
                                     writer.writerow([student, re.findall(r'\d+', data.name_lab)[0]])
             case _:
-                pass
+                print("Для введенного кода команды не определены. Подромнее смотрите в справку[Код: 0]")
 
 
 def validDate(date) -> bool:
@@ -302,6 +317,7 @@ if __name__ == "__main__":
     data = Data()
 
     while True:
+        print('Введите код операции(Справка - код[0])')
         input_data = input("Client >> ")
 
         data.code_operation = int(input_data.split(' ')[0])
