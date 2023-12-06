@@ -74,10 +74,10 @@ async def put_handle(request: web.Request) -> web.Response:
             if isinstance(data[key], str):
                 LABS[lab_name][key] = data[key]
             if isinstance(data[key], list):
-                if isinstance(LABS[lab_name][key], str):
+                if isinstance(LABS[lab_name][key], str): # Если строка, то сделать ее массивом.
                     LABS[lab_name][key] = [LABS[lab_name][key]]
 
-                for val in data[key]:
+                for val in data[key]: # И добавить элемент
                     LABS[lab_name][key].append(val)  # Если ключ есть, то перезапишет, если ключа нет, то дополнит.
         else:
             LABS[lab_name].update({key: data[key]})  # overwise
@@ -96,55 +96,7 @@ async def delete_handle(request: web.Request) -> web.Response:
     # Запрос удаления LAB.
     lab_name = request.match_info.get("name_lab", "")
     status = 200  # default
-    if request.body_exists and request.can_read_body and (lab_name in LABS):
-        data = await request.json()  # Может являться, строкой, массивом, картежем.
-
-        if isinstance(data, str):
-            if data not in LABS[lab_name].keys() or data == "DeadLine":
-                # Не все запрашиваемые ключи не имеются у данной лабы или попытка удалить обязательное поле(дату)
-                return web.Response(text=json.dumps({lab_name: "Отсутствуют ключи!"}),
-                                    status=404,
-                                    content_type='application/json')
-
-            LABS[lab_name].pop(data)
-        elif isinstance(data, list):
-            if not all_keys_available(data, LABS[lab_name].keys()):
-                return web.Response(text=json.dumps({lab_name:
-                                                         "Не все запрашиваемые ключи имеются у данной лабораторной "
-                                                         "работы."}),
-                                    status=404,
-                                    content_type='application/json')
-
-            for key in data:
-                if key != "DeadLine":  # Удаление даты игнорируем
-                    LABS[lab_name].pop(key)
-        elif isinstance(data, dict):
-            if not all_keys_available(data.keys(), LABS[lab_name].keys()):
-                # Не все запрашиваемые ключи имеются у данной лабы
-                return web.Response(text=json.dumps({lab_name: "Отсутствуют ключи!"}),
-                                    status=404,
-                                    content_type='application/json')
-
-            for key in data.keys():
-                value = data[key]  # может являться строкой, массивом, но не картежем.
-                if key == "DeadLine":
-                    continue  # Дата дедлайна всегда одна и её не удаляем т. к. она является обязательным полем.
-                elif isinstance(value, str):
-                    LABS[lab_name][key].remove(value)
-                elif isinstance(value, list):
-                    if not all_keys_available(value, LABS[lab_name][key]):
-                        # Не все удаляемые поля есть у данной лабы
-                        return web.Response(text=json.dumps({lab_name: "Не все удаляемые поля есть у данной лабы."}),
-                                            status=404,
-                                            content_type='application/json')
-
-                    for elem in value:
-                        LABS[lab_name][key].remove(elem)
-
-        return web.Response(text=json.dumps(LABS[lab_name]),
-                            status=status,
-                            content_type='application/json')
-    elif not request.body_exists and (lab_name in LABS):
+    if not request.body_exists and (lab_name in LABS):
         # Удалить всю лабу
         LABS.pop(lab_name)  # or del self.LABS[lab_name]
         return web.Response(text=json.dumps({lab_name: "Данныя лабараторная работа удалена"}),

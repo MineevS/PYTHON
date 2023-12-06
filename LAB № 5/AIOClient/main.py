@@ -49,7 +49,7 @@ async def Handler(data: Data):
                 exit/quit - выход из программы.
                 ''')
             case 1:  # get-all
-                print("Description:", "get all data all lab")
+                print("Description:", "Get all data all lab")
                 async with session.get('http://localhost:8080/labs/') as response:
                     print("Status:", response.status)
                     print("Content-type:", response.headers['content-type'])
@@ -57,7 +57,7 @@ async def Handler(data: Data):
                         jsonDate = await response.json()
                         print(data.name_lab, ": ", jsonDate, "...")
             case 2:  # get-concrete_lab
-                print("Description:", "get data concrete lab")
+                print("Description:", "Get data concrete lab")
                 data.name_lab = input(
                     "Введите имя лабораторной работы, для которой требуется вывести информацию или слово 'location' для работы с последней созданной: ")
 
@@ -71,6 +71,7 @@ async def Handler(data: Data):
                         jsonDate = await response.json()
                         print(data.name_lab, ": ", jsonDate, "...")
             case 3:  # post +
+                print("Description:", "Create lab!")
                 async with session.post('http://localhost:8080/labs') as response:
                     print("Status:", response.status)
                     print("Content-type:", response.headers['content-type'])
@@ -80,7 +81,7 @@ async def Handler(data: Data):
                         jsonDate = await response.json()
                         print(data.name_lab, ": ", jsonDate, "...")
             case 4:  # put add
-                print("Description:", "add data in lab(s)")
+                print("Description:", "Add data in lab(s)")
                 data.name_lab = input(
                     "Введите имя лабораторной работы, для которой требуется вывести информацию или слово 'location' для работы с последней созданной: ")
                 if data.name_lab != 'location':
@@ -97,7 +98,7 @@ async def Handler(data: Data):
                         jsonDate = await response.json()
                         print(data.name_lab, ": ", jsonDate, "...")
             case 5:  # put overwrite
-                print("Description:", "overwrite lab(s)")
+                print("Description:", "Overwrite lab(s)")
                 data.name_lab = input(
                     "Введите имя лабораторной работы, для которой требуется вывести информацию или слово 'location' для работы с последней созданной: ")
                 if data.name_lab != 'location':
@@ -311,7 +312,5 @@ if __name__ == "__main__":
 
         loop = asyncio.get_event_loop()
         loop.run_until_complete(Handler(data))
-
-
 
     print("Close client!")
